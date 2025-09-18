@@ -240,7 +240,13 @@
             const uf = parseInt(key.substring(0, 2));
             const validUFs = [11,12,13,14,15,16,17,21,22,23,24,25,26,27,28,29,31,32,33,35,41,42,43,50,51,52,53];
             
-            return validUFs.includes(uf);
+            if (!validUFs.includes(uf)) return false;
+            
+            // Validação adicional: verificar se os dígitos 20-21 são válidos (modelo da NFe)
+            const modelo = key.substring(20, 22);
+            if (modelo !== '55') return false; // 55 = NFe
+            
+            return true;
         }
 
         // Função para formatar chave NFe para exibição
@@ -286,8 +292,10 @@ Enviado via Scanner NF-e`);
 
                 const config = {
                     fps: 10,
-                    qrbox: { width: 300, height: 150 },
-                    aspectRatio: 2.0,
+                    qrbox: { width: 320, height: 120 },
+                    aspectRatio: 2.67,
+                    disableFlip: false,
+                    rememberLastUsedCamera: true,
                     supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
                 };
 
@@ -370,9 +378,26 @@ Enviado via Scanner NF-e`);
             e.target.value = value;
         });
 
+        // Função de teste com chave exemplo
+        function testWithExampleKey() {
+            const exampleKey = '35250962162243000345550010003941691376174651';
+            console.log('Testando com chave exemplo:', exampleKey);
+            
+            if (isValidNFeKey(exampleKey)) {
+                showStatus('✅ Teste: Chave exemplo é válida!', 'success');
+                console.log('Chave exemplo validada com sucesso');
+            } else {
+                showStatus('❌ Teste: Erro na validação da chave exemplo', 'error');
+                console.log('Erro na validação da chave exemplo');
+            }
+        }
+
         // Iniciar automaticamente ao carregar
         window.addEventListener('load', () => {
             showStatus('Aplicativo carregado. Clique em "Iniciar Scanner" para começar.', 'info');
+            
+            // Executar teste da chave exemplo
+            setTimeout(testWithExampleKey, 1000);
         });
     </script>
 </body>
