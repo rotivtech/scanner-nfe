@@ -286,8 +286,9 @@ Enviado via Scanner NF-e`);
 
                 const config = {
                     fps: 10,
-                    qrbox: { width: 250, height: 250 },
-                    aspectRatio: 1.0
+                    qrbox: { width: 300, height: 150 },
+                    aspectRatio: 2.0,
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA]
                 };
 
                 await html5QrCode.start(
@@ -295,13 +296,17 @@ Enviado via Scanner NF-e`);
                     config,
                     (decodedText) => {
                         console.log('Código detectado:', decodedText);
+                        showStatus(`Código detectado: ${decodedText.substring(0, 20)}...`, 'info');
                         
-                        if (isValidNFeKey(decodedText)) {
+                        // Limpar o texto detectado
+                        const cleanText = decodedText.replace(/\D/g, '');
+                        
+                        if (isValidNFeKey(cleanText)) {
                             showStatus('Chave NFe válida encontrada! 🎉', 'success');
-                            sendByEmail(decodedText);
+                            sendByEmail(cleanText);
                             stopScanner();
-                        } else {
-                            showStatus('Código detectado, mas não é uma chave NFe válida', 'error');
+                        } else if (cleanText.length > 0) {
+                            showStatus(`Código detectado (${cleanText.length} dígitos), mas não é uma chave NFe válida. Precisa ter 44 dígitos.`, 'error');
                         }
                     },
                     (error) => {
